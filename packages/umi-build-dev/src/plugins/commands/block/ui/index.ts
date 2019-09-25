@@ -36,7 +36,7 @@ export default (api: IApiBlock) => {
 
   api.addUIPlugin(require.resolve('../../../../../src/plugins/commands/block/ui/dist/ui.umd.js'));
 
-  const reources: Resource[] = [
+  let reources: Resource[] = [
     {
       id: 'ant-design-pro',
       name: 'Ant Design Pro',
@@ -74,6 +74,12 @@ export default (api: IApiBlock) => {
       },
     },
   ];
+  reources = api.applyPlugins('addBlockUIResource', {
+    initialValue: reources,
+  });
+  reources = api.applyPlugins('modifyBlockUIResources', {
+    initialValue: reources,
+  });
 
   api.onUISocket(({ action, failure, success, send, ...rest }) => {
     const { type, payload = {} } = action;
@@ -264,7 +270,7 @@ export default (api: IApiBlock) => {
       }
     } catch(e) {}
   }, false);
-  
+
   // TODO: remove this before publish
   window.g_enableUmiUIBlockAddEditMode = function() {
     el.innerHTML = '';
