@@ -36,7 +36,7 @@ export default (api: IApiBlock) => {
 
   api.addUIPlugin(require.resolve('../../../../../src/plugins/commands/block/ui/dist/ui.umd.js'));
 
-  let reources: Resource[] = [
+  const defaultResources: Resource[] = [
     {
       id: 'ant-design-pro',
       name: 'Ant Design Pro',
@@ -74,12 +74,6 @@ export default (api: IApiBlock) => {
       },
     },
   ];
-  reources = api.applyPlugins('addBlockUIResource', {
-    initialValue: reources,
-  });
-  reources = api.applyPlugins('modifyBlockUIResources', {
-    initialValue: reources,
-  });
 
   api.onUISocket(({ action, failure, success, send, ...rest }) => {
     const { type, payload = {} } = action;
@@ -92,6 +86,14 @@ export default (api: IApiBlock) => {
      */
     const uiLog = (logType: 'error' | 'info', info: string) =>
       rest.log(logType, `${chalk.hex('#40a9ff')('block:')} ${info}`);
+
+    let resources: Resource[] = [];
+    resources = api.applyPlugins('addBlockUIResource', {
+      initialValue: defaultResources,
+    });
+    resources = api.applyPlugins('modifyBlockUIResources', {
+      initialValue: resources,
+    });
 
     switch (type) {
       // 区块获得项目的路由
@@ -142,18 +144,18 @@ export default (api: IApiBlock) => {
       // 区块获得数据源
       case 'org.umi.block.resource':
         success({
-          data: reources,
+          data: resources,
           success: true,
         });
         break;
 
       // 获取区块列表
       case 'org.umi.block.list':
-        const { reource: reourceId } = payload as any;
-        const reource = reources.find(item => item.id === reourceId);
-        if (reource) {
-          if (reource.resourceType === 'custom') {
-            reource.getData().then(res => {
+        const { resourceId } = payload as any;
+        const resource = resources.find(item => item.id === resourceId);
+        if (resource) {
+          if (resource.resourceType === 'custom') {
+            resource.getData().then(res => {
               success(res);
             });
           } else {
@@ -165,7 +167,7 @@ export default (api: IApiBlock) => {
           }
         } else {
           failure({
-            message: `not find reource ${reourceId}`,
+            message: `not find reource ${resourceId}`,
           });
         }
         break;
