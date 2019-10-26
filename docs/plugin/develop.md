@@ -217,7 +217,7 @@ Trigger HTML rebuild.
 Set the options of the plugin, such as when you need to pass the dva configuration of the plugin set to the dva plugin in the umi-plugin-react.
 
 ```js
-api.changePluginOption('dva-plugin-id', {
+api.changePluginOption('plugin-name:id', {
   immer: true,
 });
 ```
